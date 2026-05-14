@@ -128,6 +128,38 @@ body{background:var(--paper);font-family:'DM Mono','Courier New',monospace;paddi
 .pd-actions-list li{font-size:9.5px;color:var(--ink);line-height:1.5;display:flex;align-items:flex-start;gap:7px}
 .pd-actions-list li::before{content:'→';color:var(--accent-s);flex-shrink:0}
 
+/* OS Data sections — PMF / Unit Economics / Capital */
+.pd-os-section{padding:14px 18px;border-bottom:1px solid var(--border)}
+.pd-os-section-head{font-family:Syne,sans-serif;font-size:7.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.pd-os-section-head span.pd-os-badge{font-size:6.5px;padding:2px 6px;border-radius:1px;background:var(--ink);color:rgba(255,255,255,.6);letter-spacing:.1em}
+.pd-os-cat-note{font-size:9px;color:var(--muted);line-height:1.6;padding:8px 10px;background:var(--tag);border-radius:2px;margin-bottom:10px}
+.pd-pmf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:8px}
+.pd-pmf-card{border:1px solid var(--border);border-radius:2px;padding:8px 10px;background:#fff}
+.pd-pmf-lbl{font-family:Syne,sans-serif;font-size:7.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.pd-pmf-thresholds{display:flex;flex-direction:column;gap:3px;margin-bottom:6px}
+.pd-pmf-good{font-size:8.5px;color:var(--green)}
+.pd-pmf-warn{font-size:8.5px;color:var(--amber)}
+.pd-pmf-risk{font-size:8.5px;color:var(--accent)}
+.pd-pmf-assessment{font-size:8.5px;color:var(--ink);line-height:1.5;padding-top:5px;border-top:1px solid var(--border);margin-top:4px}
+.pd-pmf-readiness{font-size:9.5px;color:var(--ink);line-height:1.65;padding:8px 10px;background:var(--warm);border-radius:2px;margin-top:8px}
+.pd-wf-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.pd-wf-cell{background:var(--tag);border-radius:2px;padding:8px 10px}
+.pd-wf-lbl{font-family:Syne,sans-serif;font-size:7px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.pd-wf-val{font-size:10px;font-weight:600;color:var(--ink)}
+.pd-wf-verdict{font-size:9.5px;color:var(--ink);line-height:1.65;padding:8px 10px;background:var(--warm);border-radius:2px;margin-top:8px}
+.pd-cap-model-name{font-family:'DM Serif Display',serif;font-size:14px;color:var(--strong);margin-bottom:6px}
+.pd-cap-phases{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.pd-cap-phase{padding:8px 10px;border-left:3px solid var(--border);background:#fff}
+.pd-cap-phase-head{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.pd-cap-phase-name{font-family:Syne,sans-serif;font-size:8.5px;font-weight:800;letter-spacing:.05em;color:var(--ink);flex:1}
+.pd-cap-phase-time{font-size:8px;color:var(--muted)}
+.pd-cap-phase-cap{font-size:9.5px;color:var(--green);font-weight:600;margin-bottom:2px}
+.pd-cap-phase-drivers{font-size:8.5px;color:var(--muted);line-height:1.4}
+.pd-cap-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 10px;background:var(--tag);border-radius:2px;margin-top:6px}
+.pd-cap-meta-lbl{font-family:Syne,sans-serif;font-size:7px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.pd-cap-meta-val{font-size:9px;color:var(--ink);line-height:1.4}
+.pd-cap-kill{font-size:8.5px;color:var(--accent);padding:7px 10px;background:#fff8f5;border:1px solid #e8cfc0;border-radius:2px;margin-top:6px;line-height:1.5}
+
 /* Footer */
 .pd-footer{padding:12px 18px;background:var(--tag);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
 .pd-footer-brand{font-family:Syne,sans-serif;font-size:7.5px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
@@ -283,6 +315,46 @@ function renderBrief(data) {
     </div>`;
   }).join('');
 
+  // PMF Analysis section
+  const pmf = b.pmfAnalysis || {};
+  const pmfThresholdCards = (pmf.thresholds || []).map(t => {
+    return `<div class="pd-pmf-card">
+      <div class="pd-pmf-lbl">${t.signal}</div>
+      <div class="pd-pmf-thresholds">
+        <div class="pd-pmf-good">✓ ${t.target}</div>
+        <div class="pd-pmf-warn">△ ${t.warn}</div>
+        <div class="pd-pmf-risk">✕ ${t.risk}</div>
+      </div>
+      ${t.assessment ? `<div class="pd-pmf-assessment">${t.assessment}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  // Unit Economics section
+  const ue = b.unitEconomics || {};
+  const cb = ue.categoryBenchmarks || {};
+  const wfCells = [
+    { l: 'Retail Price',         v: cb.retailPrice },
+    { l: 'COGS',                 v: cb.cogs },
+    { l: 'Gross Margin',         v: cb.grossMargin },
+    { l: 'Trade Spend',          v: cb.tradeSpend },
+    { l: 'Contribution Margin',  v: cb.contributionMargin },
+  ].filter(c => c.v).map(c => `<div class="pd-wf-cell"><div class="pd-wf-lbl">${c.l}</div><div class="pd-wf-val">${c.v}</div></div>`).join('');
+
+  // Capital Roadmap section
+  const cr = b.capitalRoadmap || {};
+  const phaseHtml = (cr.phaseEstimates || []).map(p => {
+    const riskColor = p.risk === 'very high' || p.risk === 'critical' ? 'var(--accent)' : p.risk === 'high' ? 'var(--amber)' : p.risk === 'medium' || p.risk === 'medium-high' ? 'var(--gold)' : 'var(--green)';
+    return `<div class="pd-cap-phase" style="border-left-color:${riskColor}">
+      <div class="pd-cap-phase-head">
+        <span class="pd-cap-phase-name">${p.phase}</span>
+        <span class="pd-cap-phase-time">${p.timeline || ''}</span>
+        <span style="font-family:Syne,sans-serif;font-size:7px;font-weight:800;color:${riskColor}">${(p.risk||'').toUpperCase()}</span>
+      </div>
+      <div class="pd-cap-phase-cap">${p.capital || ''}</div>
+      <div class="pd-cap-phase-drivers">${p.primaryDrivers || ''}</div>
+    </div>`;
+  }).join('');
+
   // Next move
   const nm = b.nextMove || {};
   const actionsHtml = (nm.immediateActions || []).map(a => `<li>${a}</li>`).join('');
@@ -343,6 +415,36 @@ function renderBrief(data) {
     ${b.headline ? `<div class="pd-headline">${b.headline}</div>` : ''}
 
     ${dimSections}
+
+    ${pmfThresholdCards ? `
+    <div class="pd-os-section">
+      <div class="pd-os-section-head">PMF THRESHOLDS <span class="pd-os-badge">ATERRA OS</span></div>
+      ${pmf.categoryNote ? `<div class="pd-os-cat-note">${pmf.categoryNote}</div>` : ''}
+      <div class="pd-pmf-grid">${pmfThresholdCards}</div>
+      ${pmf.overallPMFReadiness ? `<div class="pd-pmf-readiness">${pmf.overallPMFReadiness}</div>` : ''}
+    </div>` : ''}
+
+    ${wfCells ? `
+    <div class="pd-os-section" style="background:var(--warm)">
+      <div class="pd-os-section-head">UNIT ECONOMICS <span class="pd-os-badge">ATERRA OS</span></div>
+      <div class="pd-wf-grid">${wfCells}</div>
+      ${ue.conceptAssessment ? `<div class="pd-wf-verdict">${ue.conceptAssessment}</div>` : ''}
+      ${ue.marginArchitectureVerdict ? `<div class="pd-rubric-note"><span class="pd-rubric-note-lbl">MARGIN VERDICT</span>${ue.marginArchitectureVerdict}</div>` : ''}
+      ${ue.killCondition ? `<div class="pd-cap-kill" style="margin-top:8px">⚠ Kill condition: ${ue.killCondition}</div>` : ''}
+    </div>` : ''}
+
+    ${cr.recommendedModel ? `
+    <div class="pd-os-section">
+      <div class="pd-os-section-head">CAPITAL ROADMAP <span class="pd-os-badge">ATERRA OS</span></div>
+      <div class="pd-cap-model-name">${cr.recommendedModel}</div>
+      ${phaseHtml ? `<div class="pd-cap-phases">${phaseHtml}</div>` : ''}
+      ${(cr.breakeven || cr.burnProfile) ? `
+      <div class="pd-cap-meta">
+        ${cr.breakeven ? `<div><div class="pd-cap-meta-lbl">Break-even</div><div class="pd-cap-meta-val">${cr.breakeven}</div></div>` : ''}
+        ${cr.burnProfile ? `<div><div class="pd-cap-meta-lbl">Cash Burn</div><div class="pd-cap-meta-val">${cr.burnProfile}</div></div>` : ''}
+      </div>` : ''}
+      ${cr.capitalKillCondition ? `<div class="pd-cap-kill">⚠ Kill condition: ${cr.capitalKillCondition}</div>` : ''}
+    </div>` : ''}
 
     <div class="pd-next-move">
       <div class="pd-next-move-head">Recommended Next Move</div>
