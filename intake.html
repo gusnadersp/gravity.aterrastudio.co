@@ -101,8 +101,8 @@ select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/
 
   <!-- Logo -->
   <div class="logo-row">
-    <img src="assets/24bda9ae-d06b-4d2b-8c4e-94e5169a4f69.png" alt="Aterra Studio">
-    <span>Product Intelligence</span>
+    <span style="font-family:monospace;font-size:13px;font-weight:700;letter-spacing:0.08em;color:var(--ink)">Aterra Studio</span>
+    <span>· Product Intelligence</span>
   </div>
 
   <!-- Verifying payment -->
@@ -281,6 +281,7 @@ async function init() {
     if (data.email) document.getElementById('email').value = data.email;
     if (data.name)  document.getElementById('clientName').value = data.name;
 
+    hide('verify-state');
     show('form-wrap');
 
   } catch (err) {
