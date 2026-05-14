@@ -322,7 +322,7 @@ document.getElementById('intake-form').addEventListener('submit', async (e) => {
     const data = await res.json();
 
     if (!res.ok || !data.success) {
-      showError(data.error || 'Brief generation failed. We've been notified. Please contact hello@aterrastudio.co');
+      showError(data.error || 'Brief generation failed. Please contact hello@aterrastudio.co');
       return;
     }
 
