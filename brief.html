@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Your Product Intelligence Brief — Gravity System</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/c9c3d0ea-48a9-4b9a-a6c0-acc7dbbbbb07.png">
+<style>
+:root {
+  --ink: #1a1a18;
+  --ivory: #FEFCF8;
+  --paper: #F5F0E8;
+  --clay: #C8502A;
+  --rule: #E5E0D8;
+  --muted: #888880;
+  --green: #2E7D4F;
+  --amber: #B8861A;
+  --char: #2D2D2B;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{font-family:Georgia,serif;background:var(--paper);color:var(--ink);min-height:100vh}
+
+.page{max-width:740px;margin:0 auto;padding:0 0 80px}
+
+/* Loading */
+.loading{text-align:center;padding:100px 24px}
+.spinner{width:36px;height:36px;border:2px solid var(--rule);border-top-color:var(--clay);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading p{font-family:monospace;font-size:11px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase}
+
+/* Brief */
+.brief-wrap{display:none}
+
+/* Header */
+.brief-header{background:var(--char);padding:40px 48px;color:var(--ivory)}
+.brief-header .eyebrow{font-family:monospace;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#888;margin-bottom:12px}
+.brief-header h1{font-size:28px;font-weight:400;line-height:1.2;margin-bottom:8px;color:#F5F0E8}
+.brief-header .meta-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px}
+.brief-header .meta-item{font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#666}
+
+/* Verdict bar */
+.verdict-bar{padding:32px 48px;background:var(--char);border-top:1px solid rgba(255,255,255,.08)}
+.verdict-inner{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.verdict-label{font-family:monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#666;margin-bottom:4px}
+.verdict-word{font-size:38px;font-weight:700;letter-spacing:-0.03em;line-height:1}
+.verdict-score{font-family:monospace;font-size:14px;color:#666;margin-left:auto}
+.verdict-score strong{font-size:24px;color:var(--ivory)}
+
+/* Body */
+.brief-body{padding:40px 48px}
+
+.verdict-summary{font-size:16px;line-height:1.7;color:var(--ink);border-left:3px solid var(--clay);padding-left:20px;margin-bottom:40px}
+
+.section-label{font-family:monospace;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid var(--rule)}
+
+/* Dimension cards */
+.dimensions{display:flex;flex-direction:column;gap:16px;margin-bottom:40px}
+.dim-card{background:var(--ivory);border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.dim-card-header{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--rule);cursor:pointer;user-select:none}
+.dim-card-header:hover{background:#FAFAF5}
+.dim-id{font-family:monospace;font-size:9px;letter-spacing:0.12em;color:var(--muted);width:32px;flex-shrink:0}
+.dim-name{font-size:14px;font-weight:600;flex:1}
+.dim-score{display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0}
+.dim-score-num{font-size:22px;font-weight:700;line-height:1}
+.dim-score-max{font-size:11px;color:var(--muted)}
+.dim-score-label{font-family:monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;font-weight:700}
+.score-strong{color:#2E7D4F;background:#E8F5ED}
+.score-watch{color:#B8861A;background:#FBF3E0}
+.score-risk{color:#C8502A;background:#FBECe8}
+.dim-toggle{font-size:12px;color:var(--muted);flex-shrink:0;transition:transform .2s}
+.dim-card.open .dim-toggle{transform:rotate(180deg)}
+.dim-body{display:none;padding:20px;border-top:1px solid var(--rule);background:#FAFAF8}
+.dim-card.open .dim-body{display:block}
+.dim-headline{font-size:14px;font-weight:700;margin-bottom:12px;line-height:1.4}
+.dim-analysis{font-size:13px;line-height:1.7;color:#333;margin-bottom:14px}
+.dim-findings{margin-bottom:12px}
+.dim-findings li{font-size:12px;color:#444;margin-bottom:5px;line-height:1.5;list-style:disc;margin-left:18px}
+.dim-risks .risk-item{display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--clay);margin-bottom:4px;line-height:1.5}
+.dim-risks .risk-item::before{content:'⚠';flex-shrink:0}
+
+/* Priority risks */
+.risks-block{background:#FFF8F5;border:1px solid #E8CFC0;border-radius:4px;padding:24px;margin-bottom:32px}
+.risk-row{margin-bottom:16px}
+.risk-row:last-child{margin-bottom:0}
+.risk-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.risk-title span{color:var(--clay);margin-right:8px;font-family:monospace;font-size:11px}
+.risk-detail{font-size:13px;color:#555;line-height:1.6}
+
+/* Next move */
+.next-move-block{background:#F0F5F0;border:1px solid #C0D8C8;border-radius:4px;padding:28px;margin-bottom:40px}
+.next-move-rec{font-size:18px;font-weight:700;color:var(--ink);line-height:1.4;margin-bottom:12px}
+.next-move-rationale{font-size:14px;color:#444;line-height:1.65;margin-bottom:16px}
+.actions-label{font-family:monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--green);margin-bottom:10px}
+.actions-list{padding-left:18px}
+.actions-list li{font-size:13px;color:#333;margin-bottom:8px;line-height:1.5}
+
+/* Footer */
+.brief-footer{padding:24px 48px;border-top:1px solid var(--rule);background:var(--paper)}
+.disclaimer{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:12px}
+.footer-brand{font-family:monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#CCC}
+
+/* Print/download bar */
+.action-bar{position:sticky;bottom:0;background:var(--char);padding:14px 48px;display:flex;align-items:center;gap:12px;border-top:1px solid rgba(255,255,255,.08)}
+.action-bar span{font-family:monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:#666;flex:1}
+.btn-print{font-family:Georgia,serif;font-size:13px;padding:10px 20px;background:transparent;color:#F5F0E8;border:1px solid rgba(255,255,255,.2);border-radius:4px;cursor:pointer;transition:background .15s}
+.btn-print:hover{background:rgba(255,255,255,.1)}
+.btn-email{font-family:Georgia,serif;font-size:13px;padding:10px 20px;background:var(--clay);color:#FFF7EE;border:none;border-radius:4px;cursor:pointer}
+
+@media print{
+  .action-bar{display:none}
+  .brief-header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .verdict-bar{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .dim-body{display:block!important}
+}
+@media(max-width:600px){
+  .brief-header,.verdict-bar,.brief-body,.brief-footer{padding-left:24px;padding-right:24px}
+  .action-bar{padding:12px 24px}
+  .verdict-word{font-size:28px}
+}
+</style>
+</head>
+<body>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <p>Loading your brief…</p>
+</div>
+
+<div class="brief-wrap" id="brief-wrap">
+
+  <div class="brief-header">
+    <div class="eyebrow">Aterra Studio · Gravity System™ · Product Intelligence Brief</div>
+    <h1 id="brief-concept-name">—</h1>
+    <div class="meta-row">
+      <span class="meta-item" id="brief-tier">—</span>
+      <span class="meta-item" id="brief-date">—</span>
+    </div>
+  </div>
+
+  <div class="verdict-bar">
+    <div class="verdict-inner">
+      <div>
+        <div class="verdict-label">Gravity System Verdict</div>
+        <div class="verdict-word" id="verdict-word">—</div>
+      </div>
+      <div class="verdict-score">
+        <div class="verdict-label">Overall Score</div>
+        <div><strong id="verdict-score">—</strong><span>/100</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="brief-body">
+
+    <p class="verdict-summary" id="verdict-summary">—</p>
+
+    <div class="section-label">Intelligence Dimensions</div>
+    <div class="dimensions" id="dimensions"></div>
+
+    <div class="section-label">Priority Risks</div>
+    <div class="risks-block" id="risks-block"></div>
+
+    <div class="section-label">Recommended Next Move</div>
+    <div class="next-move-block" id="next-move-block"></div>
+
+  </div>
+
+  <div class="brief-footer">
+    <p class="disclaimer" id="disclaimer"></p>
+    <div class="footer-brand">Aterra Studio · Product Intelligence · Gravity System™</div>
+  </div>
+
+</div>
+
+<div class="action-bar" id="action-bar" style="display:none">
+  <span>Your brief has been emailed to you.</span>
+  <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
+</div>
+
+<script>
+const API = 'https://github-repo-production-fc09.up.railway.app';
+
+const params    = new URLSearchParams(window.location.search);
+const briefId   = params.get('id');
+
+const VERDICT_COLORS = {
+  'BUILD':          '#2E7D4F',
+  'REFINE':         '#B8861A',
+  'REPOSITION':     '#2A4A6B',
+  'VALIDATE FIRST': '#6B3A2A',
+  'PAUSE':          '#C8502A'
+};
+
+async function loadBrief() {
+  if (!briefId) {
+    document.getElementById('loading').innerHTML = '<p style="color:#C8502A">No brief ID found. <a href="/" style="color:#C8502A">Return to home →</a></p>';
+    return;
+  }
+
+  try {
+    const res  = await fetch(`${API}/api/brief/${briefId}`);
+    const data = await res.json();
+
+    if (!res.ok || !data.brief) {
+      document.getElementById('loading').innerHTML = '<p style="color:#C8502A">Brief not found. <a href="mailto:hello@aterrastudio.co" style="color:#C8502A">Contact us →</a></p>';
+      return;
+    }
+
+    renderBrief(data);
+
+  } catch (err) {
+    document.getElementById('loading').innerHTML = '<p style="color:#C8502A">Could not load brief. Please try refreshing.</p>';
+  }
+}
+
+function renderBrief(data) {
+  const brief = data.brief;
+  const meta  = brief.meta || {};
+
+  // Header
+  document.getElementById('brief-concept-name').textContent = meta.conceptName || 'Your Concept';
+  document.getElementById('brief-tier').textContent = data.tier === 'reviewed' ? 'Aterra Reviewed Brief' : 'Instant Gravity Scan';
+  document.getElementById('brief-date').textContent = meta.date || new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'});
+
+  // Verdict
+  const verdict = meta.verdict || '—';
+  const vEl = document.getElementById('verdict-word');
+  vEl.textContent = verdict;
+  vEl.style.color = VERDICT_COLORS[verdict] || '#F5F0E8';
+  document.getElementById('verdict-score').textContent = meta.overallScore || '—';
+
+  // Summary
+  document.getElementById('verdict-summary').textContent = brief.verdictSummary || '';
+
+  // Dimensions
+  const dimsEl = document.getElementById('dimensions');
+  (brief.dimensions || []).forEach(d => {
+    const scoreLabel = d.score >= 8 ? 'Strong' : d.score >= 5 ? 'Watch' : 'Risk';
+    const scoreCls   = d.score >= 8 ? 'score-strong' : d.score >= 5 ? 'score-watch' : 'score-risk';
+    const card = document.createElement('div');
+    card.className = 'dim-card';
+    card.innerHTML = `
+      <div class="dim-card-header" onclick="toggleDim(this)">
+        <span class="dim-id">${d.id}</span>
+        <span class="dim-name">${d.name}</span>
+        <div class="dim-score">
+          <span class="dim-score-num" style="color:${d.score >= 8 ? '#2E7D4F' : d.score >= 5 ? '#B8861A' : '#C8502A'}">${d.score}</span>
+          <span class="dim-score-max">/10</span>
+          <span class="dim-score-label ${scoreCls}">${scoreLabel}</span>
+        </div>
+        <span class="dim-toggle">▾</span>
+      </div>
+      <div class="dim-body">
+        <p class="dim-headline">${d.headline || ''}</p>
+        <p class="dim-analysis">${(d.analysis || '').replace(/\n/g,'<br>')}</p>
+        ${d.keyFindings?.length ? `<ul class="dim-findings">${d.keyFindings.map(f=>`<li>${f}</li>`).join('')}</ul>` : ''}
+        ${d.risks?.length ? `<div class="dim-risks">${d.risks.map(r=>`<div class="risk-item">${r}</div>`).join('')}</div>` : ''}
+      </div>
+    `;
+    dimsEl.appendChild(card);
+  });
+
+  // Open first dimension by default
+  const firstCard = dimsEl.querySelector('.dim-card');
+  if (firstCard) firstCard.classList.add('open');
+
+  // Priority risks
+  const risksEl = document.getElementById('risks-block');
+  (brief.priorityRisks || []).forEach(r => {
+    risksEl.innerHTML += `
+      <div class="risk-row">
+        <div class="risk-title"><span>${r.rank}.</span>${r.risk}</div>
+        <div class="risk-detail">${r.detail}</div>
+      </div>
+    `;
+  });
+
+  // Next move
+  if (brief.nextMove) {
+    const nm = brief.nextMove;
+    document.getElementById('next-move-block').innerHTML = `
+      <p class="next-move-rec">${nm.recommendation || ''}</p>
+      <p class="next-move-rationale">${nm.rationale || ''}</p>
+      ${nm.immediateActions?.length ? `
+        <div class="actions-label">Immediate Actions</div>
+        <ol class="actions-list">${nm.immediateActions.map(a=>`<li>${a}</li>`).join('')}</ol>
+      ` : ''}
+    `;
+  }
+
+  // Disclaimer
+  document.getElementById('disclaimer').textContent = brief.disclaimer || '';
+
+  // Show brief
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('brief-wrap').style.display = 'block';
+  document.getElementById('action-bar').style.display = 'flex';
+}
+
+function toggleDim(header) {
+  const card = header.closest('.dim-card');
+  card.classList.toggle('open');
+}
+
+loadBrief();
+</script>
+</body>
+</html>

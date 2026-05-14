@@ -1353,6 +1353,59 @@
   });
 </script>
 
+<script>
+// ── Gravity Checkout ──────────────────────────────────────────────
+const GRAVITY_API = 'https://github-repo-production-fc09.up.railway.app';
+
+async function startCheckout(tier) {
+  // Find the button that triggered this and show loading state
+  const btns = document.querySelectorAll('[data-tier="' + tier + '"]');
+  btns.forEach(b => { b.style.opacity = '0.6'; b.style.pointerEvents = 'none'; });
+
+  try {
+    const res = await fetch(GRAVITY_API + '/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tier })
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Something went wrong. Please try again or email hello@aterrastudio.co');
+      btns.forEach(b => { b.style.opacity = ''; b.style.pointerEvents = ''; });
+    }
+  } catch (err) {
+    alert('Could not connect to checkout. Please try again.');
+    btns.forEach(b => { b.style.opacity = ''; b.style.pointerEvents = ''; });
+  }
+}
+
+// Wire up all CTA buttons
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('a.btn').forEach(a => {
+    const text = a.textContent;
+    if (text.includes('500') || text.includes('Instant') || text.includes('Run')) {
+      a.setAttribute('data-tier', 'scan');
+      a.addEventListener('click', e => {
+        if (a.href.includes('#') || a.href.endsWith('#submit') || a.href.endsWith('#pricing')) {
+          e.preventDefault();
+          startCheckout('scan');
+        }
+      });
+    } else if (text.includes('1,500') || text.includes('Reviewed')) {
+      a.setAttribute('data-tier', 'reviewed');
+      a.addEventListener('click', e => {
+        if (a.href.includes('#') || a.href.endsWith('#submit') || a.href.endsWith('#pricing')) {
+          e.preventDefault();
+          startCheckout('reviewed');
+        }
+      });
+    }
+  });
+});
+</script>
+
 
 
 <!-- Sample Report Modal -->

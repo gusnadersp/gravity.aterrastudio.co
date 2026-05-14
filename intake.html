@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Submit Your Concept — Gravity System</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/c9c3d0ea-48a9-4b9a-a6c0-acc7dbbbbb07.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+:root {
+  --ink: #1a1a18;
+  --ivory: #FEFCF8;
+  --paper: #F5F0E8;
+  --clay: #C8502A;
+  --rule: #E5E0D8;
+  --muted: #888880;
+  --green: #2E7D4F;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{font-family:Georgia,serif;background:var(--paper);color:var(--ink);min-height:100vh}
+
+.page{max-width:660px;margin:0 auto;padding:48px 24px 80px}
+
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:48px}
+.logo-row img{height:22px;width:auto;opacity:.85}
+.logo-row span{font-family:monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted)}
+
+/* Verify state */
+.verify-state{text-align:center;padding:60px 0}
+.spinner{width:36px;height:36px;border:2px solid var(--rule);border-top-color:var(--clay);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.verify-state p{font-family:monospace;font-size:11px;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase}
+
+/* Error state */
+.error-state{text-align:center;padding:60px 0;display:none}
+.error-state .x{font-size:32px;margin-bottom:12px}
+.error-state h2{font-size:20px;margin-bottom:8px}
+.error-state p{font-size:14px;color:var(--muted);line-height:1.6}
+.error-state a{color:var(--clay);text-decoration:none;border-bottom:1px solid var(--clay)}
+
+/* Form */
+.form-wrap{display:none}
+.eyebrow{font-family:monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.form-title{font-size:28px;font-weight:400;line-height:1.25;margin-bottom:8px;color:var(--ink)}
+.form-sub{font-size:14px;color:var(--muted);line-height:1.55;margin-bottom:36px}
+
+.tier-badge{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:var(--ivory);font-family:monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;padding:6px 14px;border-radius:999px;margin-bottom:32px}
+.tier-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--clay)}
+
+.field-group{margin-bottom:28px}
+label{display:block;font-family:monospace;font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+label span{color:var(--clay)}
+input[type=text],input[type=email],textarea,select{
+  width:100%;padding:14px 16px;
+  font-family:Georgia,serif;font-size:14px;color:var(--ink);
+  background:var(--ivory);border:1px solid var(--rule);
+  border-radius:4px;outline:none;
+  transition:border-color .15s;
+  -webkit-appearance:none;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--ink)}
+textarea{resize:vertical;line-height:1.6;min-height:100px}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px;cursor:pointer}
+
+.field-hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
+
+.divider{border:none;border-top:1px solid var(--rule);margin:36px 0}
+
+.submit-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.btn-submit{display:inline-flex;align-items:center;gap:12px;font-family:Georgia,serif;font-size:16px;font-weight:600;padding:18px 32px;background:var(--clay);color:#FFF7EE;border:none;border-radius:999px;cursor:pointer;transition:background .2s,transform .2s;white-space:nowrap}
+.btn-submit:hover{background:#9D4E27;transform:translateY(-1px)}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.submit-note{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* Generating state */
+.generating{display:none;text-align:center;padding:80px 0}
+.generating .spinner{margin:0 auto 20px}
+.generating h2{font-size:20px;margin-bottom:8px}
+.generating p{font-size:13px;color:var(--muted);line-height:1.6}
+.generating .steps{margin-top:24px;text-align:left;display:inline-block}
+.generating .step-item{font-family:monospace;font-size:11px;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.generating .step-item.active{color:var(--ink)}
+.generating .step-item .dot{width:6px;height:6px;border-radius:50%;background:var(--rule);flex-shrink:0}
+.generating .step-item.active .dot{background:var(--clay)}
+
+/* Success state (for reviewed) */
+.success-state{display:none;text-align:center;padding:60px 0}
+.success-state .check{font-size:40px;margin-bottom:16px}
+.success-state h2{font-size:24px;margin-bottom:10px}
+.success-state p{font-size:14px;color:var(--muted);line-height:1.65;max-width:480px;margin:0 auto 8px}
+
+@media(max-width:480px){
+  .form-title{font-size:22px}
+  .btn-submit{width:100%;justify-content:center}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Logo -->
+  <div class="logo-row">
+    <img src="assets/24bda9ae-d06b-4d2b-8c4e-94e5169a4f69.png" alt="Aterra Studio">
+    <span>Product Intelligence</span>
+  </div>
+
+  <!-- Verifying payment -->
+  <div class="verify-state" id="verify-state">
+    <div class="spinner"></div>
+    <p>Verifying your payment…</p>
+  </div>
+
+  <!-- Error state -->
+  <div class="error-state" id="error-state">
+    <div class="x">✕</div>
+    <h2>Something went wrong</h2>
+    <p id="error-msg">We couldn't verify your payment. Please try again or <a href="mailto:hello@aterrastudio.co">contact us</a>.</p>
+    <p style="margin-top:16px"><a href="/#pricing">← Back to pricing</a></p>
+  </div>
+
+  <!-- Intake form -->
+  <div class="form-wrap" id="form-wrap">
+    <div class="eyebrow">Gravity System · Product Intelligence Brief</div>
+    <h1 class="form-title">Tell us about your concept.</h1>
+    <p class="form-sub">15 minutes of honest answers. A brief built on what you actually know — not what sounds good.</p>
+
+    <div class="tier-badge" id="tier-badge">
+      <span class="dot"></span>
+      <span id="tier-label">Instant Gravity Scan — $500</span>
+    </div>
+
+    <form id="intake-form">
+
+      <div class="field-group">
+        <label>Your name <span>*</span></label>
+        <input type="text" id="clientName" placeholder="Gustavo Nader" required>
+      </div>
+
+      <div class="field-group">
+        <label>Email address <span>*</span></label>
+        <input type="email" id="email" placeholder="you@yourbrand.com" required>
+        <div class="field-hint">Your brief will be delivered here.</div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="field-group">
+        <label>Brand or concept name <span>*</span></label>
+        <input type="text" id="brandName" placeholder="e.g. Solara, PulseRoot, Verdana" required>
+      </div>
+
+      <div class="field-group">
+        <label>Describe your product concept <span>*</span></label>
+        <textarea id="productDescription" rows="4" placeholder="What is it? What does it do? What's the core claim or benefit? Don't oversell it — just describe it plainly." required></textarea>
+      </div>
+
+      <div class="field-group">
+        <label>Product format <span>*</span></label>
+        <select id="productFormat" required>
+          <option value="">— select format —</option>
+          <option>Canned/bottled beverage</option>
+          <option>Powder stick / sachet</option>
+          <option>Supplement capsule / tablet</option>
+          <option>Liquid shot</option>
+          <option>Functional snack / bar</option>
+          <option>Functional food</option>
+          <option>Topical / skincare</option>
+          <option>Ready-to-mix powder (tub)</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label>Key ingredients and functional claims</label>
+        <textarea id="keyIngredients" rows="3" placeholder="List the key ingredients and what they're meant to do. e.g. Lion's Mane (cognitive support), Ashwagandha (stress), L-Theanine (calm focus)"></textarea>
+      </div>
+
+      <div class="field-group">
+        <label>Target consumer <span>*</span></label>
+        <input type="text" id="targetConsumer" placeholder="e.g. Health-conscious women 28–42, working professionals managing stress" required>
+      </div>
+
+      <div class="field-group">
+        <label>Target retailer or channel</label>
+        <input type="text" id="targetRetailer" placeholder="e.g. Whole Foods, Erewhon, DTC first, Amazon, Sprouts">
+        <div class="field-hint">Where do you picture this product selling first?</div>
+      </div>
+
+      <div class="field-group">
+        <label>Current stage <span>*</span></label>
+        <select id="currentStage" required>
+          <option value="">— select stage —</option>
+          <option>Early idea — nothing formulated yet</option>
+          <option>Concept stage — some formulation thinking</option>
+          <option>Formulated — have a sample or prototype</option>
+          <option>In market — existing product, evaluating next move</option>
+          <option>Pre-launch — ready to go, need validation</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label>What's the main question you need answered?</label>
+        <textarea id="keyQuestion" rows="3" placeholder="e.g. Is there real whitespace here or is the market too crowded? Does the format earn the price point? Is the ingredient story credible enough for Whole Foods?"></textarea>
+        <div class="field-hint">The more specific, the more useful the brief.</div>
+      </div>
+
+      <div class="field-group">
+        <label>Anything else we should know?</label>
+        <textarea id="additionalContext" rows="2" placeholder="Competitors you've spotted, constraints, previous research, budget range, timeline — anything that gives us useful context."></textarea>
+      </div>
+
+      <hr class="divider">
+
+      <div class="submit-row">
+        <button type="submit" class="btn-submit" id="submit-btn">
+          Run the Gravity System <span>→</span>
+        </button>
+        <p class="submit-note">Your concept is kept confidential.<br>No sharing, no model training.</p>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Generating state -->
+  <div class="generating" id="generating-state">
+    <div class="spinner"></div>
+    <h2>Running the Gravity System…</h2>
+    <p>Your concept is being read across 8 intelligence dimensions.<br>This takes about 30–60 seconds.</p>
+    <div class="steps">
+      <div class="step-item active" id="step-1"><span class="dot"></span>Market whitespace & consumer signals</div>
+      <div class="step-item" id="step-2"><span class="dot"></span>Format fit & ingredient logic</div>
+      <div class="step-item" id="step-3"><span class="dot"></span>Competitive battlefield & business-model risk</div>
+      <div class="step-item" id="step-4"><span class="dot"></span>Scoring dimensions & writing analysis</div>
+      <div class="step-item" id="step-5"><span class="dot"></span>Assembling brief & verdict</div>
+    </div>
+  </div>
+
+  <!-- Success state (reviewed tier) -->
+  <div class="success-state" id="success-state">
+    <div class="check">✓</div>
+    <h2>Your order is confirmed.</h2>
+    <p>Gustavo will review your brief personally and deliver it to <strong id="confirm-email"></strong> within <strong>3 business days.</strong></p>
+    <p style="margin-top:12px">Questions? <a href="mailto:hello@aterrastudio.co" style="color:var(--clay)">hello@aterrastudio.co</a></p>
+  </div>
+
+</div>
+
+<script>
+const API = 'https://github-repo-production-fc09.up.railway.app';
+
+const params     = new URLSearchParams(window.location.search);
+const sessionId  = params.get('session_id');
+const tier       = params.get('tier') || 'scan';
+
+// Update tier badge
+document.getElementById('tier-label').textContent =
+  tier === 'reviewed' ? 'Aterra Reviewed Brief — $1,500' : 'Instant Gravity Scan — $500';
+
+async function init() {
+  if (!sessionId) {
+    showError('No payment session found. Please complete your purchase first.');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API}/api/verify-session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.valid) {
+      showError('Payment not verified. If you completed payment, please contact hello@aterrastudio.co');
+      return;
+    }
+
+    // Pre-fill email if Stripe has it
+    if (data.email) document.getElementById('email').value = data.email;
+    if (data.name)  document.getElementById('clientName').value = data.name;
+
+    show('form-wrap');
+
+  } catch (err) {
+    showError('Could not connect to the server. Please try refreshing or contact hello@aterrastudio.co');
+  }
+}
+
+document.getElementById('intake-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+
+  const intake = {
+    clientName:        document.getElementById('clientName').value.trim(),
+    email:             document.getElementById('email').value.trim(),
+    brandName:         document.getElementById('brandName').value.trim(),
+    productDescription:document.getElementById('productDescription').value.trim(),
+    productFormat:     document.getElementById('productFormat').value,
+    keyIngredients:    document.getElementById('keyIngredients').value.trim(),
+    targetConsumer:    document.getElementById('targetConsumer').value.trim(),
+    targetRetailer:    document.getElementById('targetRetailer').value.trim(),
+    currentStage:      document.getElementById('currentStage').value,
+    keyQuestion:       document.getElementById('keyQuestion').value.trim(),
+    additionalContext: document.getElementById('additionalContext').value.trim(),
+  };
+
+  hide('form-wrap');
+  show('generating-state');
+  animateSteps();
+
+  try {
+    const res = await fetch(`${API}/api/intake`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId, tier, ...intake })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      showError(data.error || 'Brief generation failed. We've been notified. Please contact hello@aterrastudio.co');
+      return;
+    }
+
+    if (tier === 'scan' && data.brief) {
+      // Redirect to brief display page
+      window.location.href = `/brief.html?id=${sessionId}`;
+    } else {
+      // Reviewed brief — show confirmation
+      hide('generating-state');
+      document.getElementById('confirm-email').textContent = intake.email;
+      show('success-state');
+    }
+
+  } catch (err) {
+    showError('Connection error. Please try again or contact hello@aterrastudio.co');
+  }
+});
+
+function animateSteps() {
+  const steps = ['step-1','step-2','step-3','step-4','step-5'];
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i > 0) document.getElementById(steps[i-1])?.classList.remove('active');
+    if (i < steps.length) {
+      document.getElementById(steps[i])?.classList.add('active');
+      i++;
+    } else {
+      clearInterval(interval);
+    }
+  }, 8000);
+}
+
+function show(id) { document.getElementById(id).style.display = id === 'form-wrap' ? 'block' : 'flex'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+function showError(msg) {
+  hide('verify-state');
+  hide('form-wrap');
+  hide('generating-state');
+  document.getElementById('error-msg').textContent = msg;
+  document.getElementById('error-state').style.display = 'block';
+}
+
+// Init
+hide('form-wrap');
+hide('error-state');
+hide('generating-state');
+hide('success-state');
+init();
+</script>
+</body>
+</html>
