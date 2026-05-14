@@ -274,6 +274,8 @@ function renderBrief(data) {
         <div class="pd-obs-block">
           <div class="pd-obs-row"><span class="pd-obs-lbl">OBSERVED</span><span class="pd-obs-val">${d.observed || ''}</span></div>
           <div class="pd-obs-row"><span class="pd-obs-lbl">INTERPRETED AS</span><span class="pd-obs-val">${d.interpretedAs || ''}</span></div>
+          ${d.formatRecommendation ? `<div class="pd-obs-row"><span class="pd-obs-lbl">FORMAT REC.</span><span class="pd-obs-val">${d.formatRecommendation}</span></div>` : ''}
+          ${d.recommendation ? `<div class="pd-obs-row" style="border-top:1px solid var(--border)"><span class="pd-obs-lbl" style="color:var(--accent)">RECOMMENDATION</span><span class="pd-obs-val" style="font-weight:500;color:var(--strong)">${d.recommendation}</span></div>` : ''}
         </div>
         <div class="pd-verdict">${d.verdict || ''}</div>
         ${risksHtml ? `<div class="pd-risks-list">${risksHtml}</div>` : ''}
@@ -347,6 +349,11 @@ function renderBrief(data) {
       <div class="pd-next-move-rec">${nm.recommendation || ''}</div>
       <div class="pd-next-move-rat">${nm.rationale || ''}</div>
       ${actionsHtml ? `<div class="pd-actions-label">Immediate Actions</div><ul class="pd-actions-list">${actionsHtml}</ul>` : ''}
+    </div>
+
+    <div style="padding:14px 18px;background:var(--tag);border-top:1px solid var(--border)">
+      <div style="font-family:'DM Mono',monospace;font-size:7.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Legal Disclaimer</div>
+      <div style="font-size:8.5px;color:var(--muted);line-height:1.65">${b.disclaimer || 'This brief is strategic product intelligence based on available market, consumer, competitive, and ingredient signals. It does not constitute legal, regulatory, clinical, or financial advice. Scores and verdicts reflect analyst judgment and pattern recognition, not guaranteed outcomes. Always consult qualified legal, regulatory, and financial advisors before making product, investment, or launch decisions.'}</div>
     </div>
 
     <div class="pd-footer">
